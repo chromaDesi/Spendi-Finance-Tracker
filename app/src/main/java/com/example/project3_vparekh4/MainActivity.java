@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.activity.EdgeToEdge;
@@ -38,8 +39,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 100) {
             try{
-                AuthCredential creds = GoogleAuthProvider.getCredential(GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException.class).getIdToken(), null);
-                auth.signInWithCredential(creds).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                auth.signInWithCredential(GoogleAuthProvider.getCredential(GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException.class).getIdToken(), null)).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
             catch (Exception e) {
-                throw new RuntimeException(e);
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
     }

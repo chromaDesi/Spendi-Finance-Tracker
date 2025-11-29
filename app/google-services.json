@@ -20,6 +20,10 @@
             "package_name": "com.example.project3_vparekh4",
             "certificate_hash": "65bffe8dac034a9aa16cef4560cac78a641335a8"
           }
+        },
+        {
+          "client_id": "420652857472-9r88oqclj74unt3927ru9isuaned6u97.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
@@ -29,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "420652857472-9r88oqclj74unt3927ru9isuaned6u97.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
