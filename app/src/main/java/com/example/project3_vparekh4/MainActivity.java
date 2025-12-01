@@ -34,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private GoogleSignInClient mGoogleSignInClient;
 
+
+    //this is to allow the actual google login to take place
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
             catch (Exception e) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Login failed, system error", Toast.LENGTH_LONG).show();
             }
         }
     }
