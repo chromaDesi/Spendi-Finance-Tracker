@@ -2,6 +2,7 @@ package com.example.project3_vparekh4;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -17,6 +18,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity2 extends AppCompatActivity {
@@ -48,6 +51,30 @@ public class MainActivity2 extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+        });
+        BottomNavigationView navbar = findViewById(R.id.bottom_nav);
+        navbar.setSelectedItemId(R.id.expenses);
+        navbar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener(){
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                if(item.getItemId() == R.id.user){
+                    Intent intent = new Intent(MainActivity2.this, MainActivity3.class);
+                    startActivity(intent);
+                    return true;
+                }
+                else if(item.getItemId() == R.id.trends){
+                    Intent intent = new Intent(MainActivity2.this, MainActivity3.class);
+                    startActivity(intent);
+                    return true;
+                }
+                else if(item.getItemId() == R.id.target){
+                    Intent intent = new Intent(MainActivity2.this, MainActivity3.class);
+                    startActivity(intent);
+                    return true;
+                }
+                else return true;
+            }
+
         });
     }
 }
