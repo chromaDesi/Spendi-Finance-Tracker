@@ -21,14 +21,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.Date;
-
-public class MainActivity3 extends AppCompatActivity implements BudgetAdapter.OnBudgetListener {
+public class MainActivity4 extends AppCompatActivity {
 
 
     private FirebaseAuth auth;
@@ -38,7 +33,7 @@ public class MainActivity3 extends AppCompatActivity implements BudgetAdapter.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main3);
+        setContentView(R.layout.activity_main4);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -53,17 +48,13 @@ public class MainActivity3 extends AppCompatActivity implements BudgetAdapter.On
                 return;
             }
         });
-        //recycle viewer stuff
-
-
-        //navbar logic
         BottomNavigationView navbar = findViewById(R.id.bottom_nav);
-        navbar.setSelectedItemId(R.id.target);
+        navbar.setSelectedItemId(R.id.trends);
         navbar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener(){
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if(item.getItemId() == R.id.user){
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity3.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity4.this);
                     builder.setTitle("Signing Out");
                     builder.setMessage("Are you sure you want to log out?");
                     builder.setPositiveButton("Yes", (dialogInterface, i) -> {
@@ -71,29 +62,29 @@ public class MainActivity3 extends AppCompatActivity implements BudgetAdapter.On
                         mGoogleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                Intent intent = new Intent(MainActivity3.this, MainActivity.class);
+                                Intent intent = new Intent(MainActivity4.this, MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                Toast.makeText(MainActivity3.this, "Logged out", Toast.LENGTH_LONG).show();
+                                Toast.makeText(MainActivity4.this, "Logged out", Toast.LENGTH_LONG).show();
                                 startActivity(intent);
                             }
                         });
                     });
                     builder.setNegativeButton("No", (dialogInterface, i) -> {
                         dialogInterface.dismiss();
-                        navbar.setSelectedItemId(R.id.target);
+                        navbar.setSelectedItemId(R.id.trends);
                     });
                     builder.setCancelable(false);
                     builder.create().show();//display it
                     return true;
                 }
                 else if(item.getItemId() == R.id.expenses){//expenses
-                    Intent intent = new Intent(MainActivity3.this, MainActivity2.class);
+                    Intent intent = new Intent(MainActivity4.this, MainActivity2.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                     return true;
                 }
-                else if(item.getItemId() == R.id.trends){//graph
-                    Intent intent = new Intent(MainActivity3.this, MainActivity4.class);
+                else if(item.getItemId() == R.id.target){//graph
+                    Intent intent = new Intent(MainActivity4.this, MainActivity3.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                     return true;
@@ -102,19 +93,5 @@ public class MainActivity3 extends AppCompatActivity implements BudgetAdapter.On
             }
 
         });
-    }
-
-
-    private void addExpense(String name, double goal, double progress){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-        database.collection("users").document(user.getUid()).collection("budgets").add(new Budget(name, goal, progress));
-    }
-    
-    @Override
-    public void budgetDelete(Budget budget) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-        database.collection("users").document(user.getUid()).collection("budgets").document(budget.getId()).delete();
     }
 }

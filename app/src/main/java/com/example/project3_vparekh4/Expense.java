@@ -8,18 +8,17 @@ public class Expense {
     private String category;
     private Timestamp date;
     private String name;
-    private String uid;
 
     private boolean reoccuring;
+    private String id;
 
     public Expense(){}
 
-    public Expense(double expense, String category, Timestamp date, String name, String uid, boolean reoccuring) {
+    public Expense(double expense, String category, Timestamp date, String name, boolean reoccuring) {
         this.expense = expense;
         this.category = category;
         this.date = date;
         this.name = name;
-        this.uid = uid;
         this.reoccuring = reoccuring;
     }
 
@@ -55,19 +54,17 @@ public class Expense {
         this.name = name;
     }
 
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
     public boolean isReoccuring(){
         return reoccuring;
     }
 
     public boolean setReoccuring(boolean reoccuring){
         return this.reoccuring = reoccuring;
+    }
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
     }
 }
