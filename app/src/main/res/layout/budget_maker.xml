@@ -7,40 +7,17 @@
     android:padding="20dp">
 
     <EditText
-        android:id="@+id/editTextText"
+        android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="Name"
         android:inputType="text"
         android:textColor="#20E910"
-        android:textStyle="bold" />
-
-    <EditText
-        android:id="@+id/editTextDate2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Date"
-        android:inputType="none"
-        android:focusable="false"
-        android:clickable="true"
-        android:textColor="#20E910"
-        android:textStyle="bold"
-        />
-
-    <EditText
-        android:id="@+id/editTextText2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Catagory"
-        android:inputType="text"
-        android:textColor="#20E910"
         android:textStyle="bold"/>
 
     <EditText
-        android:id="@+id/editTextNumberDecimal"
+        android:id="@+id/goal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -49,11 +26,14 @@
         android:textColor="#20E910"
         android:textStyle="bold"/>
 
-    <CheckBox
-        android:id="@+id/checkBox"
+    <EditText
+        android:id="@+id/progress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Reoccuring?"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        android:hint="Amount"
         android:textColor="#20E910"
         android:textStyle="bold"/>
+
 </LinearLayout>

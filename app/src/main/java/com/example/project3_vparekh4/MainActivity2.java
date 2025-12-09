@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -35,7 +36,10 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -61,11 +65,13 @@ public class MainActivity2 extends AppCompatActivity implements ExpenseAdapter.O
         });
         auth = FirebaseAuth.getInstance();
         mGoogleSignInClient = GoogleSignIn.getClient(this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build());
-
+        expenses = new ArrayList<>();
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ExpenseAdapter(expenses, MainActivity2.this);
         recyclerView.setAdapter(adapter);
+        loadDB(calendar.getTime());
+
 
         Button b = findViewById(R.id.button3);
         b.setOnClickListener(new View.OnClickListener() {
@@ -88,6 +94,10 @@ public class MainActivity2 extends AppCompatActivity implements ExpenseAdapter.O
                             public void onDateSet(DatePicker datePicker, int yy, int mm, int dd) {
                                 date.setText(String.format("%02d/%02d/%04d", mm + 1, dd, yy));
                                 calendar.set(yy, mm, dd);
+                                calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                                calendar.set(java.util.Calendar.MINUTE, 0);
+                                calendar.set(java.util.Calendar.SECOND, 0);
+                                calendar.set(Calendar.MILLISECOND, 0);
                             }
                         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
                         datePicker.getDatePicker().setMaxDate(System.currentTimeMillis());
@@ -111,6 +121,29 @@ public class MainActivity2 extends AppCompatActivity implements ExpenseAdapter.O
                 builder.create().show();//display it
             }
         });
+        //check a diff day
+        Button changeDay = findViewById(R.id.button4);
+        changeDay.setText(String.format("%02d/%02d/%04d",calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.YEAR)));
+        changeDay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatePickerDialog datePicker = new DatePickerDialog(MainActivity2.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int yy, int mm, int dd) {
+                        changeDay.setText(String.format("%02d/%02d/%04d", mm + 1, dd, yy));
+                        calendar.set(yy, mm, dd);
+                        calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                        calendar.set(java.util.Calendar.MINUTE, 0);
+                        calendar.set(java.util.Calendar.SECOND, 0);
+                        calendar.set(Calendar.MILLISECOND, 0);
+                        loadDB(calendar.getTime());
+
+                    }
+                }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+                datePicker.getDatePicker().setMaxDate(System.currentTimeMillis());
+                datePicker.show();
+            }
+        });
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -118,7 +151,7 @@ public class MainActivity2 extends AppCompatActivity implements ExpenseAdapter.O
             }
         });
 
-
+        //navbar transition
         BottomNavigationView navbar = findViewById(R.id.bottom_nav);
         navbar.setSelectedItemId(R.id.expenses);
         navbar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener(){
@@ -137,6 +170,7 @@ public class MainActivity2 extends AppCompatActivity implements ExpenseAdapter.O
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 Toast.makeText(MainActivity2.this, "Logged out", Toast.LENGTH_LONG).show();
                                 startActivity(intent);
+                                finish();
                             }
                         });
                     });
@@ -167,7 +201,7 @@ public class MainActivity2 extends AppCompatActivity implements ExpenseAdapter.O
     }
 
 
-    private void addExpense(String name, String category, Date date, double amount, boolean reoccuring){
+    public void addExpense(String name, String category, Date date, double amount, boolean reoccuring){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         database.collection("users").document(user.getUid()).collection("expenses").add(new Expense(amount, category, new Timestamp(date), name, reoccuring));
@@ -180,5 +214,41 @@ public class MainActivity2 extends AppCompatActivity implements ExpenseAdapter.O
         database.collection("users").document(user.getUid()).collection("expenses").document(expense.getId()).delete();
     }
 
+
+    public void loadDB(Date selectedDate){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        Calendar dstart = Calendar.getInstance();
+        dstart.setTime(selectedDate);
+        Calendar dend = Calendar.getInstance();
+        dend.setTime(selectedDate);
+        dstart.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        dstart.set(java.util.Calendar.MINUTE, 0);
+        dstart.set(java.util.Calendar.SECOND, 0);
+        dstart.set(Calendar.MILLISECOND, 0);
+        dend.set(java.util.Calendar.HOUR_OF_DAY, 23);
+        dend.set(java.util.Calendar.MINUTE, 59);
+        dend.set(java.util.Calendar.SECOND, 59);
+        dend.set(Calendar.MILLISECOND, 999);
+        database.collection("users").document(user.getUid()).collection("expenses").whereGreaterThanOrEqualTo(
+                "date",
+                new Timestamp(dstart.getTime())).whereLessThanOrEqualTo("date", new Timestamp(dend.getTime())).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if(error != null){
+                }
+                else{
+                    expenses.clear();
+                    for(int i = 0; i < value.size(); ++i){
+                        Expense e = value.getDocuments().get(i).toObject(Expense.class);
+                        e.setId(value.getDocuments().get(i).getId());
+                        expenses.add(e);
+                    }
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+
+    }
 
 }

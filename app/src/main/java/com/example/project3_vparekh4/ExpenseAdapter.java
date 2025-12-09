@@ -22,7 +22,6 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
 
 
     public interface OnExpenseListener{
-        //void expenseUpdate();
         void expenseDelete(Expense expense);
     }
 
@@ -54,7 +53,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
 
     @Override
     public void onBindViewHolder(@NonNull ExpenseAdapter.ExpenseViewHolder holder, int position) {
-        holder.amount.setText(String.format("%.2f", expenses.get(position).getExpense()));
+        holder.amount.setText(String.format("$%.2f", expenses.get(position).getExpense()));
         holder.name.setText(expenses.get(position).getName());
         holder.category.setText(expenses.get(position).getCategory());
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
